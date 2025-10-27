@@ -19,7 +19,7 @@ struct BrewMethodPicker: View {
     var body: some View {
         LazyVGrid(columns: columns, spacing: 12) {
             ForEach(BrewMethod.allCases, id: \.self) { method in
-                BrewMethodCard(
+                BrewMethodCardSimple(
                     method: method,
                     isSelected: selectedMethod == method
                 )
@@ -33,7 +33,9 @@ struct BrewMethodPicker: View {
     }
 }
 
-struct BrewMethodCard: View {
+// Note: Simple version of BrewMethodCard for legacy pickers
+// The animated version with checkmark is in BrewMethodStepView.swift
+private struct BrewMethodCardSimple: View {
     @Environment(\.colorScheme) private var colorScheme
     let method: BrewMethod
     let isSelected: Bool

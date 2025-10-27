@@ -1,6 +1,6 @@
 //
 //  AddEntryView.swift
-//  coffeeJournal
+//  CoffeeMio
 //
 //  Created by Brandon Jensen on 10/26/25.
 //
@@ -14,8 +14,12 @@ struct AddEntryView: View {
 
     @State private var temperatureManager = TemperatureManager.shared
 
+    // Current step tracking
+    @State private var currentStep: CoffeeEntryStep = .coffeeName
+    @State private var stepHistory: [CoffeeEntryStep] = []
+
+    // Entry data
     @State private var coffeeName = ""
-    @State private var origin = ""
     @State private var roaster = ""
     @State private var brewMethod: BrewMethod = .pourOver
     @State private var roastLevel: RoastLevel = .medium
@@ -28,218 +32,127 @@ struct AddEntryView: View {
     @State private var rating: Double = 3.0
     @State private var tastingNotes: [String] = []
     @State private var personalNotes = ""
-    @State private var dateLogged = Date()
     @State private var selectedPhoto: UIImage?
-
-    @State private var isDetailedMode = true
+    @State private var dateLogged = Date()
 
     var body: some View {
-        NavigationStack {
-            ScrollView {
-                VStack(spacing: Theme.spacingL) {
-                    // Quick/Detailed Mode Toggle
-                    Picker("Mode", selection: $isDetailedMode) {
-                        Text("Quick").tag(false)
-                        Text("Detailed").tag(true)
-                    }
-                    .pickerStyle(.segmented)
-                    .padding(.horizontal)
+        ZStack {
+            Theme.background
+                .ignoresSafeArea()
 
-                    // Coffee Info Section
-                    VStack(alignment: .leading, spacing: Theme.spacingM) {
-                        SectionHeader(title: "Coffee Details", icon: "cup.and.saucer.fill")
-
-                        CustomTextField(title: "Coffee Name", text: $coffeeName, placeholder: "e.g., Ethiopian Yirgacheffe")
-
-                        if isDetailedMode {
-                            CustomTextField(title: "Origin", text: $origin, placeholder: "e.g., Ethiopia")
-                        }
-
-                        RoasterPicker(selectedRoaster: $roaster)
-                    }
-                    .padding(.horizontal)
-
-                    // Brew Method
-                    VStack(alignment: .leading, spacing: Theme.spacingM) {
-                        SectionHeader(title: "Brew Method", icon: "drop.fill")
-
-                        BrewMethodPicker(selectedMethod: $brewMethod)
-                    }
-                    .padding(.horizontal)
-
-                    // Roast Level
-                    if isDetailedMode {
-                        VStack(alignment: .leading, spacing: Theme.spacingM) {
-                            SectionHeader(title: "Roast Level", icon: "flame.fill")
-
-                            RoastLevelIndicator(selectedLevel: $roastLevel)
-                        }
-                        .padding(.horizontal)
-                    }
-
-                    // Grind Size
-                    if isDetailedMode {
-                        VStack(alignment: .leading, spacing: Theme.spacingM) {
-                            SectionHeader(title: "Grind Size", icon: "circle.grid.3x3.fill")
-
-                            GrindSizeSlider(grindSize: $grindSize)
-                        }
-                        .padding(.horizontal)
-                    }
-
-                    // Brew Parameters
-                    if isDetailedMode {
-                        VStack(alignment: .leading, spacing: Theme.spacingM) {
-                            SectionHeader(title: "Brew Parameters", icon: "chart.bar.fill")
-
-                            HStack(spacing: Theme.spacingM) {
-                                VStack(alignment: .leading, spacing: 8) {
-                                    Text("Coffee (g)")
-                                        .font(.caption)
-                                        .foregroundStyle(Theme.textSecondary)
-
-                                    TextField("18", value: $coffeeGrams, format: .number)
-                                        .keyboardType(.decimalPad)
-                                        .textFieldStyle(CustomTextFieldStyle())
-                                }
-
-                                VStack(alignment: .leading, spacing: 8) {
-                                    Text("Water (g)")
-                                        .font(.caption)
-                                        .foregroundStyle(Theme.textSecondary)
-
-                                    TextField("300", value: $waterGrams, format: .number)
-                                        .keyboardType(.decimalPad)
-                                        .textFieldStyle(CustomTextFieldStyle())
-                                }
-                            }
-
-                            VStack(alignment: .leading, spacing: 8) {
-                                Text("Water Temp (\(temperatureManager.selectedUnit.symbol))")
-                                    .font(.caption)
-                                    .foregroundStyle(Theme.textSecondary)
-
-                                HStack {
-                                    Slider(value: $waterTemp, in: temperatureManager.sliderRange(), step: 1)
-                                        .tint(Theme.warmOrange)
-
-                                    Text("\(Int(waterTemp))\(temperatureManager.selectedUnit.symbol)")
-                                        .font(.system(.body, design: .rounded, weight: .semibold))
-                                        .foregroundStyle(Theme.primaryBrown)
-                                        .frame(width: 60)
-                                }
-                            }
-
-                            HStack(spacing: Theme.spacingM) {
-                                VStack(alignment: .leading, spacing: 8) {
-                                    Text("Brew Time")
-                                        .font(.caption)
-                                        .foregroundStyle(Theme.textSecondary)
-
-                                    HStack {
-                                        TextField("3", value: $brewMinutes, format: .number)
-                                            .keyboardType(.numberPad)
-                                            .textFieldStyle(CustomTextFieldStyle())
-                                            .frame(width: 60)
-
-                                        Text("m")
-                                            .foregroundStyle(Theme.textSecondary)
-
-                                        TextField("30", value: $brewSeconds, format: .number)
-                                            .keyboardType(.numberPad)
-                                            .textFieldStyle(CustomTextFieldStyle())
-                                            .frame(width: 60)
-
-                                        Text("s")
-                                            .foregroundStyle(Theme.textSecondary)
-                                    }
-                                }
-
-                                Spacer()
-                            }
-                        }
-                        .padding(.horizontal)
-                    }
-
-                    // Rating
-                    VStack(alignment: .leading, spacing: Theme.spacingM) {
-                        SectionHeader(title: "Rating", icon: "star.fill")
-
-                        RatingView(rating: $rating, interactive: true)
-                    }
-                    .padding(.horizontal)
-
-                    // Tasting Notes
-                    VStack(alignment: .leading, spacing: Theme.spacingM) {
-                        SectionHeader(title: "Tasting Notes", icon: "nose.fill")
-
-                        TastingNotesSelector(selectedNotes: $tastingNotes)
-                    }
-                    .padding(.horizontal)
-
-                    // Personal Notes
-                    VStack(alignment: .leading, spacing: Theme.spacingM) {
-                        SectionHeader(title: "Personal Notes", icon: "note.text")
-
-                        TextEditor(text: $personalNotes)
-                            .frame(height: 120)
-                            .padding(12)
-                            .background(Theme.cream)
-                            .cornerRadius(Theme.cornerRadiusMedium)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: Theme.cornerRadiusMedium)
-                                    .stroke(Theme.warmOrange.opacity(0.2), lineWidth: 1)
-                            )
-                    }
-                    .padding(.horizontal)
-
-                    // Photo
-                    VStack(alignment: .leading, spacing: Theme.spacingM) {
-                        SectionHeader(title: "Photo", icon: "camera.fill")
-
-                        if let photo = selectedPhoto {
-                            ImagePreview(image: photo) {
-                                selectedPhoto = nil
-                            }
-                        } else {
-                            ImagePicker(selectedImage: $selectedPhoto)
-                        }
-                    }
-                    .padding(.horizontal)
-
-                    // Date
-                    VStack(alignment: .leading, spacing: Theme.spacingM) {
-                        SectionHeader(title: "Date", icon: "calendar")
-
-                        DatePicker("", selection: $dateLogged, displayedComponents: [.date, .hourAndMinute])
-                            .datePickerStyle(.compact)
-                            .tint(Theme.warmOrange)
-                    }
-                    .padding(.horizontal)
-
-                    Spacer(minLength: 100)
+            VStack(spacing: 0) {
+                // Step container with current step content
+                StepContainerView(
+                    currentStep: currentStep,
+                    canGoBack: !stepHistory.isEmpty,
+                    canSkip: currentStep.isOptional,
+                    onBack: goBack,
+                    onSkip: goToNextStep
+                ) {
+                    stepContent
+                        .transition(.asymmetric(
+                            insertion: .scale(scale: 0.95).combined(with: .opacity).combined(with: .move(edge: .trailing)),
+                            removal: .scale(scale: 0.95).combined(with: .opacity).combined(with: .move(edge: .leading))
+                        ))
                 }
-                .padding(.vertical)
             }
-            .background(Theme.background)
-            .navigationTitle("New Entry")
-            .navigationBarTitleDisplayMode(.large)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") {
-                        dismiss()
-                    }
-                    .foregroundStyle(Theme.textSecondary)
+        }
+        .toolbar {
+            ToolbarItem(placement: .cancellationAction) {
+                Button("Cancel") {
+                    dismiss()
                 }
+                .foregroundStyle(Theme.textSecondary)
+            }
+        }
+    }
 
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") {
-                        saveEntry()
-                    }
-                    .fontWeight(.semibold)
-                    .foregroundStyle(Theme.primaryBrown)
-                    .disabled(coffeeName.isEmpty)
-                }
+    @ViewBuilder
+    private var stepContent: some View {
+        Group {
+            switch currentStep {
+            case .coffeeName:
+                CoffeeNameStepView(coffeeName: $coffeeName, onNext: goToNextStep)
+
+            case .roaster:
+                RoasterStepView(roaster: $roaster, onNext: goToNextStep)
+
+            case .brewMethod:
+                BrewMethodStepView(brewMethod: $brewMethod, onNext: goToNextStep)
+
+            case .roastLevel:
+                RoastLevelStepView(roastLevel: $roastLevel, onNext: goToNextStep)
+
+            case .grindSize:
+                GrindSizeStepView(grindSize: $grindSize, onNext: goToNextStep)
+
+            case .brewRatio:
+                BrewRatioStepView(
+                    coffeeGrams: $coffeeGrams,
+                    waterGrams: $waterGrams,
+                    onNext: goToNextStep
+                )
+
+            case .waterTemp:
+                WaterTempStepView(waterTemp: $waterTemp, onNext: goToNextStep)
+
+            case .brewTime:
+                BrewTimeStepView(
+                    brewMinutes: $brewMinutes,
+                    brewSeconds: $brewSeconds,
+                    onNext: goToNextStep
+                )
+
+            case .rating:
+                RatingStepView(rating: $rating, onNext: goToNextStep)
+
+            case .tastingNotes:
+                TastingNotesStepView(tastingNotes: $tastingNotes, onNext: goToNextStep)
+
+            case .personalNotes:
+                PersonalNotesStepView(personalNotes: $personalNotes, onNext: goToNextStep)
+
+            case .photo:
+                PhotoStepView(selectedImage: $selectedPhoto, onNext: goToNextStep)
+
+            case .review:
+                ReviewStepView(
+                    coffeeName: coffeeName,
+                    roaster: roaster,
+                    brewMethod: brewMethod,
+                    roastLevel: roastLevel,
+                    grindSize: grindSize,
+                    coffeeGrams: coffeeGrams,
+                    waterGrams: waterGrams,
+                    waterTemp: waterTemp,
+                    brewMinutes: brewMinutes,
+                    brewSeconds: brewSeconds,
+                    rating: rating,
+                    tastingNotes: tastingNotes,
+                    personalNotes: personalNotes,
+                    selectedImage: selectedPhoto,
+                    onSave: saveEntry
+                )
+            }
+        }
+        .id(currentStep)
+    }
+
+    private func goToNextStep() {
+        withAnimation(.spring(response: 0.55, dampingFraction: 0.75)) {
+            stepHistory.append(currentStep)
+
+            let nextStepRawValue = currentStep.rawValue + 1
+            if let nextStep = CoffeeEntryStep(rawValue: nextStepRawValue) {
+                currentStep = nextStep
+            }
+        }
+    }
+
+    private func goBack() {
+        withAnimation(.spring(response: 0.55, dampingFraction: 0.75)) {
+            if let previousStep = stepHistory.popLast() {
+                currentStep = previousStep
             }
         }
     }
@@ -250,7 +163,7 @@ struct AddEntryView: View {
 
         let entry = CoffeeEntry(
             coffeeName: coffeeName,
-            origin: origin,
+            origin: "",  // Not collected in step flow
             roaster: roaster,
             brewMethod: brewMethod,
             roastLevel: roastLevel,

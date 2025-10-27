@@ -11,69 +11,69 @@ struct Theme {
     // MARK: - Dynamic Colors (Light/Dark Mode)
 
     // Primary Coffee Browns
-    static let primaryBrown = Color(
+    static let primaryBrown: Color = Color(
         light: Color(hex: "6F4E37"),
         dark: Color(hex: "D4A574")
     )
 
-    static let darkBrown = Color(
+    static let darkBrown: Color = Color(
         light: Color(hex: "3E2723"),
         dark: Color(hex: "C19A6B")
     )
 
     // Warm Creams/Backgrounds
-    static let cream = Color(
+    static let cream: Color = Color(
         light: Color(hex: "F5E6D3"),
         dark: Color(hex: "2C1810")
     )
 
-    static let lightCream = Color(
+    static let lightCream: Color = Color(
         light: Color(hex: "E4D5C7"),
         dark: Color(hex: "3E2723")
     )
 
     // Warm Accents (same in both modes for consistency)
-    static let warmOrange = Color(hex: "D4A574")
-    static let goldenBrown = Color(hex: "C19A6B")
+    static let warmOrange: Color = Color(hex: "D4A574")
+    static let goldenBrown: Color = Color(hex: "C19A6B")
 
     // Semantic Colors
-    static let background = Color(
+    static let background: Color = Color(
         light: Color(hex: "FBF7F4"),
         dark: Color(hex: "1A0F0A")  // Deep espresso brown
     )
 
-    static let cardBackground = Color(
+    static let cardBackground: Color = Color(
         light: .white,
         dark: Color(hex: "2C1810")  // Rich dark brown
     )
 
-    static let textPrimary = Color(
+    static let textPrimary: Color = Color(
         light: Color(hex: "2C1810"),
         dark: Color(hex: "F5E6D3")  // Warm cream text
     )
 
-    static let textSecondary = Color(
+    static let textSecondary: Color = Color(
         light: Color(hex: "8B7355"),
         dark: Color(hex: "B09880")  // Lighter brown for contrast
     )
 
     // Roast Level Colors (brightened slightly for dark mode)
-    static let roastLight = Color(
+    static let roastLight: Color = Color(
         light: Color(hex: "C8A882"),
         dark: Color(hex: "D4B896")
     )
 
-    static let roastMedium = Color(
+    static let roastMedium: Color = Color(
         light: Color(hex: "8B6F47"),
         dark: Color(hex: "A68A5F")
     )
 
-    static let roastMediumDark = Color(
+    static let roastMediumDark: Color = Color(
         light: Color(hex: "5D4037"),
         dark: Color(hex: "8B6F47")
     )
 
-    static let roastDark = Color(
+    static let roastDark: Color = Color(
         light: Color(hex: "3E2723"),
         dark: Color(hex: "6F4E37")
     )
