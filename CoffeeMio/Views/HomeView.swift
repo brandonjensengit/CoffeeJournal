@@ -330,54 +330,121 @@ struct EmptyStateView: View {
 // MARK: - Steam Animation
 
 struct SteamView: View {
-    @State private var isAnimating = false
-
     var body: some View {
         ZStack {
-            SteamWisp(delay: 0.0, xOffset: -8)
-            SteamWisp(delay: 0.4, xOffset: 0)
-            SteamWisp(delay: 0.8, xOffset: 8)
-        }
-        .onAppear {
-            isAnimating = true
+            ForEach(0..<6, id: \.self) { index in
+                HomeSteamWisp(index: index, totalCount: 6, baseOpacity: 0.5)
+                    .id("home-steam-\(index)")
+            }
         }
     }
 }
 
-struct SteamWisp: View {
+struct HomeSteamWisp: View {
     @Environment(\.colorScheme) private var colorScheme
-    let delay: Double
-    let xOffset: Double
+    let index: Int
+    let totalCount: Int
+    let baseOpacity: Double
+
+    // Animation state
     @State private var yOffset: Double = 0
+    @State private var xOffset: Double = 0
     @State private var opacity: Double = 0
+    @State private var scale: Double = 0.3
+    @State private var rotation: Double = 0
+    @State private var hasStartedAnimating = false
+
+    // Random variations for natural look
+    let initialXOffset: Double
+    let duration: Double
+    let maxSway: Double
+    let rotationAmount: Double
+    let wispWidth: CGFloat
+    let wispHeight: CGFloat
+    let blurRadius: CGFloat
+
+    init(index: Int, totalCount: Int, baseOpacity: Double) {
+        self.index = index
+        self.totalCount = totalCount
+        self.baseOpacity = baseOpacity
+
+        // Generate random variations for natural appearance
+        self.initialXOffset = Double.random(in: -15...15)
+        self.duration = Double.random(in: 3.5...5.0)
+        self.maxSway = Double.random(in: 15...25)
+        self.rotationAmount = Double.random(in: -10...10)
+        self.wispWidth = CGFloat.random(in: 12...20)
+        self.wispHeight = CGFloat.random(in: 30...50)
+        self.blurRadius = CGFloat.random(in: 10...15)
+    }
 
     var steamColor: Color {
-        colorScheme == .dark ? Color.white : Color.gray.opacity(0.7)
+        // Make steam darker and more visible in light mode
+        colorScheme == .dark ? Color.white : Color.gray
     }
 
     var body: some View {
-        Capsule()
-            .fill(steamColor)
-            .frame(width: 4, height: 20)
-            .blur(radius: 2)
+        // Organic wispy shape
+        WispShape()
+            .fill(
+                LinearGradient(
+                    colors: [
+                        steamColor.opacity(1.0),
+                        steamColor.opacity(0.6),
+                        steamColor.opacity(0.0)
+                    ],
+                    startPoint: .bottom,
+                    endPoint: .top
+                )
+            )
+            .frame(width: wispWidth, height: wispHeight)
+            .blur(radius: blurRadius)
+            .shadow(color: colorScheme == .dark ? .white.opacity(0.5) : .black.opacity(0.3), radius: 3)
+            .scaleEffect(scale)
+            .rotationEffect(.degrees(rotation))
             .offset(x: xOffset, y: yOffset)
             .opacity(opacity)
             .onAppear {
+                guard !hasStartedAnimating else { return }
+                hasStartedAnimating = true
+
+                let delay = Double(index) * 0.5
+
+                // Rising motion with ease-out
                 withAnimation(
-                    .easeOut(duration: 2.0)
+                    .easeOut(duration: duration)
                     .repeatForever(autoreverses: false)
                     .delay(delay)
                 ) {
-                    yOffset = -60
+                    yOffset = -80
                     opacity = 0
+                    scale = 2.0
                 }
 
-                // Initial opacity pulse
+                // Horizontal sway with sine wave
                 withAnimation(
-                    .easeIn(duration: 0.3)
+                    .easeInOut(duration: duration * 0.6)
+                    .repeatForever(autoreverses: true)
                     .delay(delay)
                 ) {
-                    opacity = 0.7
+                    xOffset = initialXOffset + maxSway
+                }
+
+                // Rotation
+                withAnimation(
+                    .linear(duration: duration)
+                    .repeatForever(autoreverses: false)
+                    .delay(delay)
+                ) {
+                    rotation = rotationAmount
+                }
+
+                // Initial fade in
+                withAnimation(
+                    .easeIn(duration: 0.5)
+                    .delay(delay)
+                ) {
+                    opacity = baseOpacity
                 }
             }
     }

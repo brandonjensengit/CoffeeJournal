@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct BrewMethodStepView: View {
-    @Binding var brewMethod: BrewMethod
+    @Binding var brewMethod: BrewMethod?
     let onNext: () -> Void
 
     @Environment(\.colorScheme) private var colorScheme

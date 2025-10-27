@@ -21,8 +21,8 @@ struct AddEntryView: View {
     // Entry data
     @State private var coffeeName = ""
     @State private var roaster = ""
-    @State private var brewMethod: BrewMethod = .pourOver
-    @State private var roastLevel: RoastLevel = .medium
+    @State private var brewMethod: BrewMethod? = nil
+    @State private var roastLevel: RoastLevel? = nil
     @State private var grindSize: Double = 5.0
     @State private var coffeeGrams: Double = 18.0
     @State private var waterGrams: Double = 300.0
@@ -158,6 +158,12 @@ struct AddEntryView: View {
     }
 
     private func saveEntry() {
+        // Ensure required fields are set
+        guard let brewMethod = brewMethod,
+              let roastLevel = roastLevel else {
+            return
+        }
+
         // Compress photo if exists
         let compressedPhotoData = selectedPhoto?.compressed()
 

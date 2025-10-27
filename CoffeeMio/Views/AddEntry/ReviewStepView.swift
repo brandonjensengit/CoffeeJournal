@@ -13,8 +13,8 @@ struct ReviewStepView: View {
 
     let coffeeName: String
     let roaster: String
-    let brewMethod: BrewMethod
-    let roastLevel: RoastLevel
+    let brewMethod: BrewMethod?
+    let roastLevel: RoastLevel?
     let grindSize: Double
     let coffeeGrams: Double
     let waterGrams: Double
@@ -109,9 +109,13 @@ struct ReviewStepView: View {
 
                         // Brew method and roast
                         HStack(spacing: 24) {
-                            DetailItem(icon: brewMethod.icon, label: "Method", value: brewMethod.rawValue)
+                            if let brewMethod = brewMethod {
+                                DetailItem(icon: brewMethod.icon, label: "Method", value: brewMethod.rawValue)
+                            }
                             Spacer()
-                            DetailItem(icon: "flame.fill", label: "Roast", value: roastLevel.rawValue)
+                            if let roastLevel = roastLevel {
+                                DetailItem(icon: "flame.fill", label: "Roast", value: roastLevel.rawValue)
+                            }
                         }
 
                         Divider()
