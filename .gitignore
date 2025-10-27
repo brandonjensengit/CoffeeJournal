@@ -1,0 +1,27 @@
+# Claude Code internal directory
+.claude/
+
+# Xcode
+*.xcodeproj/*
+!*.xcodeproj/project.pbxproj
+!*.xcodeproj/xcshareddata/
+*.xcworkspace/*
+!*.xcworkspace/contents.xcworkspacedata
+*.xcuserdatad/
+DerivedData/
+.swiftpm/
+.build/
+
+# macOS
+.DS_Store
+
+# User settings
+xcuserdata/
+
+# Swift Package Manager
+.swiftpm/
+Packages/
+Package.resolved
+
+# CocoaPods
+Pods/
