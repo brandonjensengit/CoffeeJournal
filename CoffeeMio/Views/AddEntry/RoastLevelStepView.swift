@@ -17,11 +17,8 @@ struct RoastLevelStepView: View {
         VStack(spacing: 40) {
             Spacer()
 
-            // Question
-            Text("What's the\nroast level?")
-                .font(.system(size: 32, weight: .bold, design: .rounded))
-                .foregroundStyle(Theme.primaryBrown)
-                .multilineTextAlignment(.center)
+            // Animated bean title
+            RoastWordBeanTitle(selectedRoastLevel: roastLevel)
 
             // Animated coffee beans display
             if let selectedRoastLevel = roastLevel {
@@ -49,8 +46,8 @@ struct RoastLevelStepView: View {
                         let generator = UIImpactFeedbackGenerator(style: .medium)
                         generator.impactOccurred()
 
-                        // Auto-advance after brief delay
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                        // Auto-advance after roasting animation completes (1.8s transition + 0.5s pause)
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 2.3) {
                             onNext()
                         }
                     }
