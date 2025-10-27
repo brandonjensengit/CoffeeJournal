@@ -11,6 +11,8 @@ struct EditEntryView: View {
     @Environment(\.dismiss) private var dismiss
     @Bindable var entry: CoffeeEntry
 
+    @State private var selectedPhoto: UIImage?
+    @State private var photoChanged = false
     @State private var isDetailedMode = true
 
     var body: some View {
@@ -150,6 +152,26 @@ struct EditEntryView: View {
                     }
                     .padding(.horizontal)
 
+                    // Photo
+                    VStack(alignment: .leading, spacing: Theme.spacingM) {
+                        SectionHeader(title: "Photo", icon: "camera.fill")
+
+                        if let photo = selectedPhoto {
+                            ImagePreview(image: photo) {
+                                selectedPhoto = nil
+                                photoChanged = true
+                            }
+                        } else {
+                            ImagePicker(selectedImage: $selectedPhoto)
+                        }
+                    }
+                    .padding(.horizontal)
+                    .onChange(of: selectedPhoto) { _, newValue in
+                        if newValue != nil {
+                            photoChanged = true
+                        }
+                    }
+
                     // Date
                     VStack(alignment: .leading, spacing: Theme.spacingM) {
                         SectionHeader(title: "Date", icon: "calendar")
@@ -167,6 +189,13 @@ struct EditEntryView: View {
             .background(Theme.background)
             .navigationTitle("Edit Entry")
             .navigationBarTitleDisplayMode(.large)
+            .onAppear {
+                // Load existing photo if available
+                if let photoData = entry.photoData,
+                   let uiImage = UIImage(data: photoData) {
+                    selectedPhoto = uiImage
+                }
+            }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") {
@@ -177,12 +206,20 @@ struct EditEntryView: View {
 
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Done") {
+                        saveChanges()
                         dismiss()
                     }
                     .fontWeight(.semibold)
                     .foregroundStyle(Theme.primaryBrown)
                 }
             }
+        }
+    }
+
+    private func saveChanges() {
+        // Update photo data if changed
+        if photoChanged {
+            entry.photoData = selectedPhoto?.compressed()
         }
     }
 }

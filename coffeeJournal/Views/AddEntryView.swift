@@ -27,6 +27,7 @@ struct AddEntryView: View {
     @State private var tastingNotes: [String] = []
     @State private var personalNotes = ""
     @State private var dateLogged = Date()
+    @State private var selectedPhoto: UIImage?
 
     @State private var isDetailedMode = true
 
@@ -190,6 +191,20 @@ struct AddEntryView: View {
                     }
                     .padding(.horizontal)
 
+                    // Photo
+                    VStack(alignment: .leading, spacing: Theme.spacingM) {
+                        SectionHeader(title: "Photo", icon: "camera.fill")
+
+                        if let photo = selectedPhoto {
+                            ImagePreview(image: photo) {
+                                selectedPhoto = nil
+                            }
+                        } else {
+                            ImagePicker(selectedImage: $selectedPhoto)
+                        }
+                    }
+                    .padding(.horizontal)
+
                     // Date
                     VStack(alignment: .leading, spacing: Theme.spacingM) {
                         SectionHeader(title: "Date", icon: "calendar")
@@ -228,6 +243,9 @@ struct AddEntryView: View {
     }
 
     private func saveEntry() {
+        // Compress photo if exists
+        let compressedPhotoData = selectedPhoto?.compressed()
+
         let entry = CoffeeEntry(
             coffeeName: coffeeName,
             origin: origin,
@@ -243,7 +261,8 @@ struct AddEntryView: View {
             rating: rating,
             tastingNotes: tastingNotes,
             personalNotes: personalNotes,
-            dateLogged: dateLogged
+            dateLogged: dateLogged,
+            photoData: compressedPhotoData
         )
 
         modelContext.insert(entry)
