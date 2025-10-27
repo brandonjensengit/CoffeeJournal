@@ -12,6 +12,7 @@ struct SettingsView: View {
     @Environment(\.colorScheme) private var colorScheme
 
     @State private var appearanceManager = AppearanceManager.shared
+    @State private var temperatureManager = TemperatureManager.shared
 
     var body: some View {
         NavigationStack {
@@ -49,6 +50,38 @@ struct SettingsView: View {
                     Divider()
                         .padding(.horizontal)
 
+                    // Temperature Unit Section
+                    VStack(alignment: .leading, spacing: Theme.spacingM) {
+                        HStack(spacing: 8) {
+                            Image(systemName: "thermometer")
+                                .font(.system(size: 16, weight: .semibold))
+                                .foregroundStyle(Theme.warmOrange)
+
+                            Text("Temperature Unit")
+                                .font(.system(size: 20, weight: .bold))
+                                .foregroundStyle(Theme.textPrimary)
+                        }
+
+                        VStack(spacing: 12) {
+                            ForEach(TemperatureUnit.allCases, id: \.self) { unit in
+                                TemperatureUnitCard(
+                                    unit: unit,
+                                    isSelected: temperatureManager.selectedUnit == unit,
+                                    currentColorScheme: colorScheme
+                                )
+                                .onTapGesture {
+                                    withAnimation(.spring(response: 0.3)) {
+                                        temperatureManager.selectedUnit = unit
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    .padding(.horizontal)
+
+                    Divider()
+                        .padding(.horizontal)
+
                     // App Info
                     VStack(spacing: Theme.spacingS) {
                         Image(systemName: "cup.and.saucer.fill")
@@ -61,7 +94,7 @@ struct SettingsView: View {
                                 )
                             )
 
-                        Text("Coffee Journal")
+                        Text("CoffeeMio")
                             .font(.system(size: 24, weight: .bold))
                             .foregroundStyle(Theme.textPrimary)
 
@@ -160,6 +193,72 @@ struct AppearanceModeCard: View {
             return "Always use dark theme"
         case .system:
             return "Follow system setting"
+        }
+    }
+}
+
+// MARK: - Temperature Unit Card
+
+struct TemperatureUnitCard: View {
+    let unit: TemperatureUnit
+    let isSelected: Bool
+    let currentColorScheme: ColorScheme
+
+    var body: some View {
+        HStack(spacing: Theme.spacingM) {
+            // Icon
+            ZStack {
+                Circle()
+                    .fill(isSelected ? Theme.primaryBrown : Theme.cream)
+                    .frame(width: 50, height: 50)
+
+                Image(systemName: unit.icon)
+                    .font(.system(size: 22))
+                    .foregroundStyle(isSelected ? Theme.background : Theme.primaryBrown)
+            }
+
+            // Text
+            VStack(alignment: .leading, spacing: 4) {
+                Text(unit.rawValue)
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundStyle(Theme.textPrimary)
+
+                Text(unitDescription)
+                    .font(.system(size: 14))
+                    .foregroundStyle(Theme.textSecondary)
+            }
+
+            Spacer()
+
+            // Checkmark
+            if isSelected {
+                Image(systemName: "checkmark.circle.fill")
+                    .font(.system(size: 24))
+                    .foregroundStyle(Theme.warmOrange)
+            }
+        }
+        .padding(Theme.spacingM)
+        .background(Theme.cardBackground)
+        .cornerRadius(Theme.cornerRadiusMedium)
+        .overlay(
+            RoundedRectangle(cornerRadius: Theme.cornerRadiusMedium)
+                .stroke(isSelected ? Theme.warmOrange : Color.clear, lineWidth: 2)
+        )
+        .shadow(
+            color: isSelected
+                ? Theme.warmOrange.opacity(0.2)
+                : (currentColorScheme == .dark ? Color.black.opacity(0.3) : Color.black.opacity(0.05)),
+            radius: isSelected ? 8 : 4,
+            y: 2
+        )
+    }
+
+    private var unitDescription: String {
+        switch unit {
+        case .celsius:
+            return "Display temperature in °C"
+        case .fahrenheit:
+            return "Display temperature in °F"
         }
     }
 }

@@ -59,9 +59,17 @@ struct HomeView: View {
                     }
                 }
             }
-            .navigationTitle("Coffee Journal")
+            .navigationBarTitleDisplayMode(.inline)
             .searchable(text: $searchText, prompt: "Search coffees...")
             .toolbar {
+                ToolbarItem(placement: .principal) {
+                    Image("CoffeeMioLogo")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(height: 110)
+                        .padding(.top, 8)
+                }
+
                 ToolbarItem(placement: .topBarLeading) {
                     Menu {
                         Button(action: { selectedBrewMethod = nil }) {
@@ -257,18 +265,34 @@ struct CoffeeEntryCard: View {
 struct EmptyStateView: View {
     @Environment(\.colorScheme) private var colorScheme
     @Binding var showingAddEntry: Bool
+    @State private var cupOpacity: Double = 0
+    @State private var cupScale: Double = 0.8
 
     var body: some View {
         VStack(spacing: Theme.spacingL) {
-            Image(systemName: "cup.and.saucer.fill")
-                .font(.system(size: 80))
-                .foregroundStyle(
-                    LinearGradient(
-                        colors: [Theme.warmOrange, Theme.goldenBrown],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
+            ZStack {
+                Image(systemName: "cup.and.saucer.fill")
+                    .font(.system(size: 80))
+                    .foregroundStyle(
+                        LinearGradient(
+                            colors: [Theme.warmOrange, Theme.goldenBrown],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
                     )
-                )
+                    .opacity(cupOpacity)
+                    .scaleEffect(cupScale)
+
+                SteamView()
+                    .offset(y: -50)
+                    .opacity(cupOpacity)
+            }
+            .onAppear {
+                withAnimation(.spring(response: 1.2, dampingFraction: 0.6)) {
+                    cupOpacity = 1.0
+                    cupScale = 1.0
+                }
+            }
 
             VStack(spacing: Theme.spacingS) {
                 Text("Start Your Coffee Journey")
@@ -300,6 +324,62 @@ struct EmptyStateView: View {
             }
         }
         .padding()
+    }
+}
+
+// MARK: - Steam Animation
+
+struct SteamView: View {
+    @State private var isAnimating = false
+
+    var body: some View {
+        ZStack {
+            SteamWisp(delay: 0.0, xOffset: -8)
+            SteamWisp(delay: 0.4, xOffset: 0)
+            SteamWisp(delay: 0.8, xOffset: 8)
+        }
+        .onAppear {
+            isAnimating = true
+        }
+    }
+}
+
+struct SteamWisp: View {
+    @Environment(\.colorScheme) private var colorScheme
+    let delay: Double
+    let xOffset: Double
+    @State private var yOffset: Double = 0
+    @State private var opacity: Double = 0
+
+    var steamColor: Color {
+        colorScheme == .dark ? Color.white : Color.gray.opacity(0.7)
+    }
+
+    var body: some View {
+        Capsule()
+            .fill(steamColor)
+            .frame(width: 4, height: 20)
+            .blur(radius: 2)
+            .offset(x: xOffset, y: yOffset)
+            .opacity(opacity)
+            .onAppear {
+                withAnimation(
+                    .easeOut(duration: 2.0)
+                    .repeatForever(autoreverses: false)
+                    .delay(delay)
+                ) {
+                    yOffset = -60
+                    opacity = 0
+                }
+
+                // Initial opacity pulse
+                withAnimation(
+                    .easeIn(duration: 0.3)
+                    .delay(delay)
+                ) {
+                    opacity = 0.7
+                }
+            }
     }
 }
 

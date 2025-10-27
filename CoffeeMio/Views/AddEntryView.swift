@@ -12,6 +12,8 @@ struct AddEntryView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
 
+    @State private var temperatureManager = TemperatureManager.shared
+
     @State private var coffeeName = ""
     @State private var origin = ""
     @State private var roaster = ""
@@ -20,7 +22,7 @@ struct AddEntryView: View {
     @State private var grindSize: Double = 5.0
     @State private var coffeeGrams: Double = 18.0
     @State private var waterGrams: Double = 300.0
-    @State private var waterTemp: Double = 93.0
+    @State private var waterTemp: Double = TemperatureManager.shared.defaultTemperature()
     @State private var brewMinutes: Int = 3
     @State private var brewSeconds: Int = 0
     @State private var rating: Double = 3.0
@@ -53,7 +55,7 @@ struct AddEntryView: View {
                             CustomTextField(title: "Origin", text: $origin, placeholder: "e.g., Ethiopia")
                         }
 
-                        CustomTextField(title: "Roaster", text: $roaster, placeholder: "e.g., Blue Bottle")
+                        RoasterPicker(selectedRoaster: $roaster)
                     }
                     .padding(.horizontal)
 
@@ -113,18 +115,18 @@ struct AddEntryView: View {
                             }
 
                             VStack(alignment: .leading, spacing: 8) {
-                                Text("Water Temp (°C)")
+                                Text("Water Temp (\(temperatureManager.selectedUnit.symbol))")
                                     .font(.caption)
                                     .foregroundStyle(Theme.textSecondary)
 
                                 HStack {
-                                    Slider(value: $waterTemp, in: 70...100, step: 1)
+                                    Slider(value: $waterTemp, in: temperatureManager.sliderRange(), step: 1)
                                         .tint(Theme.warmOrange)
 
-                                    Text("\(Int(waterTemp))°C")
+                                    Text("\(Int(waterTemp))\(temperatureManager.selectedUnit.symbol)")
                                         .font(.system(.body, design: .rounded, weight: .semibold))
                                         .foregroundStyle(Theme.primaryBrown)
-                                        .frame(width: 50)
+                                        .frame(width: 60)
                                 }
                             }
 
@@ -255,7 +257,7 @@ struct AddEntryView: View {
             grindSize: grindSize,
             coffeeGrams: coffeeGrams,
             waterGrams: waterGrams,
-            waterTemperature: waterTemp,
+            waterTemperature: temperatureManager.toCelsius(waterTemp),
             brewTimeMinutes: brewMinutes,
             brewTimeSeconds: brewSeconds,
             rating: rating,

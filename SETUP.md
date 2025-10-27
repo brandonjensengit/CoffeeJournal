@@ -1,6 +1,6 @@
-# Coffee Journal App - Setup Guide
+# CoffeeMio App - Setup Guide
 
-## ☕️ Your Coffee Journal MVP is Ready!
+## ☕️ Your CoffeeMio MVP is Ready!
 
 A sleek, modern coffee journaling app with a warm, cozy aesthetic built with SwiftUI and SwiftData.
 
@@ -39,14 +39,14 @@ A sleek, modern coffee journaling app with a warm, cozy aesthetic built with Swi
 
 1. **Open the Xcode Project**
    ```bash
-   open coffeeJournal.xcodeproj
+   open CoffeeMio.xcodeproj
    ```
 
 2. **Add New Files to Xcode Project**
    All files have been created in the correct folders, but Xcode needs to know about them:
 
-   - In Xcode, right-click on the `coffeeJournal` folder in the Project Navigator
-   - Select "Add Files to 'coffeeJournal'..."
+   - In Xcode, right-click on the `CoffeeMio` folder in the Project Navigator
+   - Select "Add Files to 'CoffeeMio'..."
    - Select these folders (check "Create folder references"):
      - `Models/`
      - `Views/`
@@ -63,8 +63,8 @@ A sleek, modern coffee journaling app with a warm, cozy aesthetic built with Swi
 ### 📁 Project Structure
 
 ```
-coffeeJournal/
-├── coffeeJournalApp.swift          # App entry point with SwiftData setup
+CoffeeMio/
+├── CoffeeMioApp.swift          # App entry point with SwiftData setup
 ├── Models/
 │   └── CoffeeEntry.swift          # SwiftData model for coffee entries
 ├── Views/

@@ -11,9 +11,11 @@ struct EditEntryView: View {
     @Environment(\.dismiss) private var dismiss
     @Bindable var entry: CoffeeEntry
 
+    @State private var temperatureManager = TemperatureManager.shared
     @State private var selectedPhoto: UIImage?
     @State private var photoChanged = false
     @State private var isDetailedMode = true
+    @State private var displayTemperature: Double = 0
 
     var body: some View {
         NavigationStack {
@@ -25,7 +27,7 @@ struct EditEntryView: View {
 
                         CustomTextField(title: "Coffee Name", text: $entry.coffeeName, placeholder: "e.g., Ethiopian Yirgacheffe")
                         CustomTextField(title: "Origin", text: $entry.origin, placeholder: "e.g., Ethiopia")
-                        CustomTextField(title: "Roaster", text: $entry.roaster, placeholder: "e.g., Blue Bottle")
+                        RoasterPicker(selectedRoaster: $entry.roaster)
                     }
                     .padding(.horizontal)
 
@@ -77,19 +79,25 @@ struct EditEntryView: View {
                         }
 
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("Water Temp (°C)")
+                            Text("Water Temp (\(temperatureManager.selectedUnit.symbol))")
                                 .font(.caption)
                                 .foregroundStyle(Theme.textSecondary)
 
                             HStack {
-                                Slider(value: $entry.waterTemperature, in: 70...100, step: 1)
+                                Slider(value: $displayTemperature, in: temperatureManager.sliderRange(), step: 1)
                                     .tint(Theme.warmOrange)
+                                    .onChange(of: displayTemperature) { _, newValue in
+                                        entry.waterTemperature = temperatureManager.toCelsius(newValue)
+                                    }
 
-                                Text("\(Int(entry.waterTemperature))°C")
+                                Text("\(Int(displayTemperature))\(temperatureManager.selectedUnit.symbol)")
                                     .font(.system(.body, design: .rounded, weight: .semibold))
                                     .foregroundStyle(Theme.primaryBrown)
-                                    .frame(width: 50)
+                                    .frame(width: 60)
                             }
+                        }
+                        .onAppear {
+                            displayTemperature = temperatureManager.displayValue(entry.waterTemperature)
                         }
 
                         HStack(spacing: Theme.spacingM) {

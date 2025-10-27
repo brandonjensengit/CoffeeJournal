@@ -2,7 +2,7 @@
 
 ## 🌙 Warm Dark Mode - Complete!
 
-Your Coffee Journal app now has a beautiful, cozy dark mode that maintains the warm coffee shop aesthetic with deep espresso browns instead of harsh black backgrounds.
+Your CoffeeMio app now has a beautiful, cozy dark mode that maintains the warm coffee shop aesthetic with deep espresso browns instead of harsh black backgrounds.
 
 ---
 
@@ -199,7 +199,7 @@ All text meets WCAG AA standards:
 
 ### Updated Files
 - `Theme/Theme.swift` - Dynamic color system
-- `coffeeJournalApp.swift` - Initialize appearance
+- `CoffeeMioApp.swift` - Initialize appearance
 - `Views/HomeView.swift` - Settings button + dynamic colors
 - `Views/EntryDetailView.swift` - Dynamic gradients
 - `Components/BrewMethodPicker.swift` - Dynamic shadows

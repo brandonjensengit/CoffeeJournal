@@ -2,7 +2,7 @@
 
 ## 📸 Photo Feature Implementation
 
-The Coffee Journal app now supports taking photos and selecting from the photo library!
+The CoffeeMio app now supports taking photos and selecting from the photo library!
 
 ---
 
@@ -36,12 +36,12 @@ Since iOS 14+, you must request user permission to access the camera and photo l
 
 1. **Open the Xcode Project**
    ```bash
-   open coffeeJournal.xcodeproj
+   open CoffeeMio.xcodeproj
    ```
 
 2. **Select the Project**
-   - Click on `coffeeJournal` in the Project Navigator (top-left)
-   - Select the `coffeeJournal` target under "TARGETS"
+   - Click on `CoffeeMio` in the Project Navigator (top-left)
+   - Select the `CoffeeMio` target under "TARGETS"
 
 3. **Open Info Tab**
    - Click the "Info" tab at the top
@@ -67,7 +67,7 @@ Since iOS 14+, you must request user permission to access the camera and photo l
 
 ### Alternative Method (if Info tab doesn't show)
 
-1. Right-click on `coffeeJournal` folder in Project Navigator
+1. Right-click on `CoffeeMio` folder in Project Navigator
 2. Select "New File..."
 3. Choose "Property List"
 4. Name it `Info.plist`
@@ -198,7 +198,7 @@ Since iOS 14+, you must request user permission to access the camera and photo l
 ## 📂 New Files Created
 
 ```
-coffeeJournal/
+CoffeeMio/
 ├── Utilities/
 │   ├── ImagePicker.swift        # Photo picker + camera
 │   └── ImageCompression.swift   # Image compression utility

@@ -14,6 +14,7 @@ struct EntryDetailView: View {
     @Environment(\.colorScheme) private var colorScheme
 
     @Bindable var entry: CoffeeEntry
+    @State private var temperatureManager = TemperatureManager.shared
 
     @State private var showingDeleteAlert = false
     @State private var showingEditView = false
@@ -136,7 +137,7 @@ struct EntryDetailView: View {
                             ParameterCard(icon: "scalemass.fill", label: "Coffee", value: "\(Int(entry.coffeeGrams))g")
                             ParameterCard(icon: "drop.fill", label: "Water", value: "\(Int(entry.waterGrams))g")
                             ParameterCard(icon: "chart.line.uptrend.xyaxis", label: "Ratio", value: entry.brewRatio)
-                            ParameterCard(icon: "thermometer", label: "Temperature", value: "\(Int(entry.waterTemperature))°C")
+                            ParameterCard(icon: "thermometer", label: "Temperature", value: temperatureManager.displayTemperature(entry.waterTemperature))
                             ParameterCard(icon: "clock.fill", label: "Brew Time", value: entry.totalBrewTime)
                             ParameterCard(icon: "circle.grid.3x3.fill", label: "Grind", value: grindLabel(entry.grindSize))
                         }

@@ -9,7 +9,7 @@ import SwiftUI
 import SwiftData
 
 @main
-struct coffeeJournalApp: App {
+struct CoffeeMioApp: App {
     @State private var appearanceManager = AppearanceManager.shared
 
     var sharedModelContainer: ModelContainer = {
