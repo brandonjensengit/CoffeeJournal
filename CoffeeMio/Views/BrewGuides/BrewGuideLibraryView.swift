@@ -86,71 +86,11 @@ struct BrewGuideLibraryView: View {
                         .padding(.horizontal)
                     }
 
-                    // Coming soon section
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("Coming Soon")
-                            .font(.system(size: 20, weight: .bold))
-                            .foregroundStyle(Theme.primaryBrown)
-                            .padding(.horizontal)
-
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(spacing: 12) {
-                                ForEach(comingSoonMethods, id: \.self) { method in
-                                    ComingSoonCard(methodName: method)
-                                }
-                            }
-                            .padding(.horizontal)
-                        }
-                    }
-                    .padding(.top, 20)
-
                     Spacer(minLength: 40)
                 }
                 .padding(.bottom, 20)
             }
             .background(Theme.background)
-        }
-    }
-
-    private let comingSoonMethods = [
-        "Pour Over (V60)",
-        "AeroPress",
-        "Espresso",
-        "Cold Brew",
-        "Moka Pot"
-    ]
-}
-
-// MARK: - Coming Soon Card
-
-struct ComingSoonCard: View {
-    let methodName: String
-
-    var body: some View {
-        VStack(spacing: 8) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(Theme.cardBackground.opacity(0.5))
-                    .frame(width: 120, height: 120)
-
-                VStack(spacing: 6) {
-                    Image(systemName: "hourglass")
-                        .font(.system(size: 30))
-                        .foregroundStyle(Theme.textSecondary.opacity(0.5))
-
-                    Text("Coming\nSoon")
-                        .font(.system(size: 12, weight: .semibold))
-                        .foregroundStyle(Theme.textSecondary.opacity(0.7))
-                        .multilineTextAlignment(.center)
-                }
-            }
-
-            Text(methodName)
-                .font(.system(size: 13, weight: .medium))
-                .foregroundStyle(Theme.textSecondary)
-                .lineLimit(2)
-                .multilineTextAlignment(.center)
-                .frame(width: 120)
         }
     }
 }
