@@ -190,6 +190,7 @@ struct CustomizationFormView: View {
                                             )
                                         }
                                     }
+                                    .padding(.horizontal, 4)
                                 }
                             }
 
@@ -228,6 +229,7 @@ struct CustomizationFormView: View {
                                             )
                                         }
                                     }
+                                    .padding(.horizontal, 4)
                                 }
                             }
 
@@ -250,14 +252,14 @@ struct CustomizationFormView: View {
                                 }
                             }
                         }
-                        .padding(.leading, 32)
+                        .padding(.top, 8)
+                        .padding(.leading, 16)
                     }
                 }
-                .padding(.horizontal)
-                .padding(.vertical, 12)
+                .padding(16)
                 .background(Theme.cardBackground)
                 .cornerRadius(16)
-                .padding(.horizontal)
+                .padding(.horizontal, 16)
 
                 // Sweetener Section
                 VStack(alignment: .leading, spacing: 16) {
@@ -274,46 +276,49 @@ struct CustomizationFormView: View {
                             sweeteners.append(Sweetener())
                         }) {
                             Image(systemName: "plus.circle.fill")
+                                .font(.system(size: 22))
                                 .foregroundStyle(Theme.warmOrange)
                         }
                     }
 
                     if !sweeteners.isEmpty {
-                        ForEach(Array(sweeteners.enumerated()), id: \.offset) { index, sweetener in
-                            HStack(spacing: 12) {
-                                Picker("Type", selection: Binding(
-                                    get: { sweeteners[index].type },
-                                    set: { sweeteners[index].type = $0 }
-                                )) {
-                                    ForEach(SweetenerType.allCases, id: \.self) { type in
-                                        Text(type.rawValue).tag(type)
+                        VStack(spacing: 12) {
+                            ForEach(Array(sweeteners.enumerated()), id: \.offset) { index, sweetener in
+                                HStack(spacing: 12) {
+                                    Picker("Type", selection: Binding(
+                                        get: { sweeteners[index].type },
+                                        set: { sweeteners[index].type = $0 }
+                                    )) {
+                                        ForEach(SweetenerType.allCases, id: \.self) { type in
+                                            Text(type.rawValue).tag(type)
+                                        }
                                     }
-                                }
-                                .pickerStyle(.menu)
-                                .tint(Theme.primaryBrown)
+                                    .pickerStyle(.menu)
+                                    .tint(Theme.primaryBrown)
 
-                                TextField("Amount", text: Binding(
-                                    get: { sweeteners[index].amount },
-                                    set: { sweeteners[index].amount = $0 }
-                                ))
-                                .textFieldStyle(.roundedBorder)
-                                .frame(width: 100)
+                                    TextField("Amount", text: Binding(
+                                        get: { sweeteners[index].amount },
+                                        set: { sweeteners[index].amount = $0 }
+                                    ))
+                                    .textFieldStyle(.roundedBorder)
+                                    .frame(width: 100)
 
-                                Button(action: {
-                                    sweeteners.remove(at: index)
-                                }) {
-                                    Image(systemName: "trash.circle.fill")
-                                        .foregroundStyle(Theme.textSecondary)
+                                    Button(action: {
+                                        sweeteners.remove(at: index)
+                                    }) {
+                                        Image(systemName: "trash.circle.fill")
+                                            .font(.system(size: 22))
+                                            .foregroundStyle(Theme.textSecondary)
+                                    }
                                 }
                             }
                         }
                     }
                 }
-                .padding(.horizontal)
-                .padding(.vertical, 12)
+                .padding(16)
                 .background(Theme.cardBackground)
                 .cornerRadius(16)
-                .padding(.horizontal)
+                .padding(.horizontal, 16)
 
                 // Flavors Section
                 VStack(alignment: .leading, spacing: 16) {
@@ -330,46 +335,49 @@ struct CustomizationFormView: View {
                             flavors.append(Flavor())
                         }) {
                             Image(systemName: "plus.circle.fill")
+                                .font(.system(size: 22))
                                 .foregroundStyle(Theme.warmOrange)
                         }
                     }
 
                     if !flavors.isEmpty {
-                        ForEach(Array(flavors.enumerated()), id: \.offset) { index, flavor in
-                            HStack(spacing: 12) {
-                                Picker("Type", selection: Binding(
-                                    get: { flavors[index].type },
-                                    set: { flavors[index].type = $0 }
-                                )) {
-                                    ForEach(FlavorType.allCases, id: \.self) { type in
-                                        Text(type.rawValue).tag(type)
+                        VStack(spacing: 12) {
+                            ForEach(Array(flavors.enumerated()), id: \.offset) { index, flavor in
+                                HStack(spacing: 12) {
+                                    Picker("Type", selection: Binding(
+                                        get: { flavors[index].type },
+                                        set: { flavors[index].type = $0 }
+                                    )) {
+                                        ForEach(FlavorType.allCases, id: \.self) { type in
+                                            Text(type.rawValue).tag(type)
+                                        }
                                     }
-                                }
-                                .pickerStyle(.menu)
-                                .tint(Theme.primaryBrown)
+                                    .pickerStyle(.menu)
+                                    .tint(Theme.primaryBrown)
 
-                                TextField("Amount", text: Binding(
-                                    get: { flavors[index].amount },
-                                    set: { flavors[index].amount = $0 }
-                                ))
-                                .textFieldStyle(.roundedBorder)
-                                .frame(width: 100)
+                                    TextField("Amount", text: Binding(
+                                        get: { flavors[index].amount },
+                                        set: { flavors[index].amount = $0 }
+                                    ))
+                                    .textFieldStyle(.roundedBorder)
+                                    .frame(width: 100)
 
-                                Button(action: {
-                                    flavors.remove(at: index)
-                                }) {
-                                    Image(systemName: "trash.circle.fill")
-                                        .foregroundStyle(Theme.textSecondary)
+                                    Button(action: {
+                                        flavors.remove(at: index)
+                                    }) {
+                                        Image(systemName: "trash.circle.fill")
+                                            .font(.system(size: 22))
+                                            .foregroundStyle(Theme.textSecondary)
+                                    }
                                 }
                             }
                         }
                     }
                 }
-                .padding(.horizontal)
-                .padding(.vertical, 12)
+                .padding(16)
                 .background(Theme.cardBackground)
                 .cornerRadius(16)
-                .padding(.horizontal)
+                .padding(.horizontal, 16)
 
                 // Spices & Extras
                 VStack(alignment: .leading, spacing: 16) {
@@ -418,22 +426,24 @@ struct CustomizationFormView: View {
                             .font(.caption)
                             .foregroundStyle(Theme.textSecondary)
 
-                        HStack(spacing: 8) {
-                            ForEach([nil] + IceAmount.allCases.map { $0 as IceAmount? }, id: \.self) { amount in
-                                SelectableChip(
-                                    label: amount?.rawValue ?? "None",
-                                    isSelected: iceAmount == amount,
-                                    action: { iceAmount = amount }
-                                )
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 8) {
+                                ForEach([nil] + IceAmount.allCases.map { $0 as IceAmount? }, id: \.self) { amount in
+                                    SelectableChip(
+                                        label: amount?.rawValue ?? "None",
+                                        isSelected: iceAmount == amount,
+                                        action: { iceAmount = amount }
+                                    )
+                                }
                             }
+                            .padding(.horizontal, 4)
                         }
                     }
                 }
-                .padding(.horizontal)
-                .padding(.vertical, 12)
+                .padding(16)
                 .background(Theme.cardBackground)
                 .cornerRadius(16)
-                .padding(.horizontal)
+                .padding(.horizontal, 16)
 
                 // Done Button
                 Button(action: saveAndContinue) {
