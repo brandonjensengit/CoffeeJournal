@@ -22,6 +22,7 @@ struct AddEntryView: View {
     @State private var coffeeName = ""
     @State private var roaster = ""
     @State private var brewMethod: BrewMethod? = nil
+    @State private var servingStyle: ServingStyle? = nil
     @State private var roastLevel: RoastLevel? = nil
     @State private var grindSize: Double = 5.0
     @State private var coffeeGrams: Double = 18.0
@@ -33,6 +34,7 @@ struct AddEntryView: View {
     @State private var tastingNotes: [String] = []
     @State private var personalNotes = ""
     @State private var selectedPhoto: UIImage?
+    @State private var customizations: CoffeeCustomizations?
     @State private var dateLogged = Date()
 
     var body: some View {
@@ -80,6 +82,9 @@ struct AddEntryView: View {
             case .brewMethod:
                 BrewMethodStepView(brewMethod: $brewMethod, onNext: goToNextStep)
 
+            case .servingStyle:
+                ServingStyleStepView(servingStyle: $servingStyle, onNext: goToNextStep)
+
             case .roastLevel:
                 RoastLevelStepView(roastLevel: $roastLevel, onNext: goToNextStep)
 
@@ -103,6 +108,9 @@ struct AddEntryView: View {
                     onNext: goToNextStep
                 )
 
+            case .customizations:
+                CustomizationsStepView(customizations: $customizations, onNext: goToNextStep)
+
             case .rating:
                 RatingStepView(rating: $rating, onNext: goToNextStep)
 
@@ -120,17 +128,19 @@ struct AddEntryView: View {
                     coffeeName: coffeeName,
                     roaster: roaster,
                     brewMethod: brewMethod,
+                    servingStyle: servingStyle,
                     roastLevel: roastLevel,
                     grindSize: grindSize,
                     coffeeGrams: coffeeGrams,
                     waterGrams: waterGrams,
-                    waterTemp: waterTemp,
+                    waterTemp: brewMethod == .coldBrew ? nil : waterTemp,
                     brewMinutes: brewMinutes,
                     brewSeconds: brewSeconds,
                     rating: rating,
                     tastingNotes: tastingNotes,
                     personalNotes: personalNotes,
                     selectedImage: selectedPhoto,
+                    customizations: customizations,
                     onSave: saveEntry
                 )
             }
@@ -142,9 +152,20 @@ struct AddEntryView: View {
         withAnimation(.spring(response: 0.55, dampingFraction: 0.75)) {
             stepHistory.append(currentStep)
 
-            let nextStepRawValue = currentStep.rawValue + 1
-            if let nextStep = CoffeeEntryStep(rawValue: nextStepRawValue) {
-                currentStep = nextStep
+            // Conditional logic for Cold Brew
+            if currentStep == .brewMethod && brewMethod == .coldBrew {
+                // Skip servingStyle for cold brew (always iced)
+                servingStyle = .iced
+                currentStep = .roastLevel
+            } else if currentStep == .brewRatio && brewMethod == .coldBrew {
+                // Skip waterTemp for cold brew
+                currentStep = .brewTime
+            } else {
+                // Normal progression
+                let nextStepRawValue = currentStep.rawValue + 1
+                if let nextStep = CoffeeEntryStep(rawValue: nextStepRawValue) {
+                    currentStep = nextStep
+                }
             }
         }
     }
@@ -160,12 +181,16 @@ struct AddEntryView: View {
     private func saveEntry() {
         // Ensure required fields are set
         guard let brewMethod = brewMethod,
-              let roastLevel = roastLevel else {
+              let roastLevel = roastLevel,
+              let servingStyle = servingStyle else {
             return
         }
 
         // Compress photo if exists
         let compressedPhotoData = selectedPhoto?.compressed()
+
+        // Water temperature is optional for cold brew
+        let finalWaterTemp: Double? = brewMethod == .coldBrew ? nil : temperatureManager.toCelsius(waterTemp)
 
         let entry = CoffeeEntry(
             coffeeName: coffeeName,
@@ -176,14 +201,17 @@ struct AddEntryView: View {
             grindSize: grindSize,
             coffeeGrams: coffeeGrams,
             waterGrams: waterGrams,
-            waterTemperature: temperatureManager.toCelsius(waterTemp),
+            waterTemperature: finalWaterTemp,
             brewTimeMinutes: brewMinutes,
             brewTimeSeconds: brewSeconds,
             rating: rating,
             tastingNotes: tastingNotes,
             personalNotes: personalNotes,
             dateLogged: dateLogged,
-            photoData: compressedPhotoData
+            isFavorite: false,
+            isIced: servingStyle == .iced,
+            photoData: compressedPhotoData,
+            customizations: customizations
         )
 
         modelContext.insert(entry)

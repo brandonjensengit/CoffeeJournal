@@ -16,6 +16,7 @@ struct EditEntryView: View {
     @State private var photoChanged = false
     @State private var isDetailedMode = true
     @State private var displayTemperature: Double = 0
+    @State private var showCustomizationsEditor = false
 
     var body: some View {
         NavigationStack {
@@ -78,26 +79,34 @@ struct EditEntryView: View {
                             }
                         }
 
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("Water Temp (\(temperatureManager.selectedUnit.symbol))")
-                                .font(.caption)
-                                .foregroundStyle(Theme.textSecondary)
+                        if entry.brewMethod != .coldBrew {
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("Water Temp (\(temperatureManager.selectedUnit.symbol))")
+                                    .font(.caption)
+                                    .foregroundStyle(Theme.textSecondary)
 
-                            HStack {
-                                Slider(value: $displayTemperature, in: temperatureManager.sliderRange(), step: 1)
-                                    .tint(Theme.warmOrange)
-                                    .onChange(of: displayTemperature) { _, newValue in
-                                        entry.waterTemperature = temperatureManager.toCelsius(newValue)
-                                    }
+                                HStack {
+                                    Slider(value: $displayTemperature, in: temperatureManager.sliderRange(), step: 1)
+                                        .tint(Theme.warmOrange)
+                                        .onChange(of: displayTemperature) { _, newValue in
+                                            entry.waterTemperature = temperatureManager.toCelsius(newValue)
+                                        }
 
-                                Text("\(Int(displayTemperature))\(temperatureManager.selectedUnit.symbol)")
-                                    .font(.system(.body, design: .rounded, weight: .semibold))
-                                    .foregroundStyle(Theme.primaryBrown)
-                                    .frame(width: 60)
+                                    Text("\(Int(displayTemperature))\(temperatureManager.selectedUnit.symbol)")
+                                        .font(.system(.body, design: .rounded, weight: .semibold))
+                                        .foregroundStyle(Theme.primaryBrown)
+                                        .frame(width: 60)
+                                }
                             }
-                        }
-                        .onAppear {
-                            displayTemperature = temperatureManager.displayValue(entry.waterTemperature)
+                            .onAppear {
+                                if let waterTemp = entry.waterTemperature {
+                                    displayTemperature = temperatureManager.displayValue(waterTemp)
+                                } else {
+                                    // Default for non-cold-brew entries that somehow don't have temperature
+                                    displayTemperature = temperatureManager.defaultTemperature()
+                                    entry.waterTemperature = temperatureManager.toCelsius(displayTemperature)
+                                }
+                            }
                         }
 
                         HStack(spacing: Theme.spacingM) {
@@ -157,6 +166,93 @@ struct EditEntryView: View {
                                 RoundedRectangle(cornerRadius: Theme.cornerRadiusMedium)
                                     .stroke(Theme.warmOrange.opacity(0.2), lineWidth: 1)
                             )
+                    }
+                    .padding(.horizontal)
+
+                    // Customizations
+                    VStack(alignment: .leading, spacing: Theme.spacingM) {
+                        Button(action: {
+                            withAnimation(.spring(response: 0.3)) {
+                                showCustomizationsEditor.toggle()
+                            }
+                        }) {
+                            HStack {
+                                SectionHeader(title: "Customizations", icon: "slider.horizontal.3")
+                                Spacer()
+                                Image(systemName: showCustomizationsEditor ? "chevron.up.circle.fill" : "chevron.down.circle.fill")
+                                    .foregroundStyle(Theme.warmOrange)
+                            }
+                        }
+                        .buttonStyle(PlainButtonStyle())
+
+                        if showCustomizationsEditor {
+                            NavigationLink(destination: CustomizationEditorView(entry: entry)) {
+                                HStack {
+                                    Text("Edit Customizations")
+                                        .foregroundStyle(Theme.primaryBrown)
+                                    Spacer()
+                                    Image(systemName: "chevron.right")
+                                        .foregroundStyle(Theme.textSecondary)
+                                }
+                                .padding()
+                                .background(Theme.cream)
+                                .cornerRadius(Theme.cornerRadiusMedium)
+                            }
+
+                            // Display current customizations
+                            if let customizations = entry.customizations, customizations.hasAnyCustomizations {
+                                VStack(alignment: .leading, spacing: 12) {
+                                    if let milk = customizations.milk {
+                                        VStack(alignment: .leading, spacing: 4) {
+                                            Text("Milk: \(milk.type.rawValue) - \(milk.amount)")
+                                                .font(.system(size: 14))
+                                                .foregroundStyle(Theme.textSecondary)
+                                        }
+                                    }
+
+                                    if !customizations.sweeteners.isEmpty {
+                                        Text("Sweeteners: \(customizations.sweeteners.map { "\($0.type.rawValue) (\($0.amount))" }.joined(separator: ", "))")
+                                            .font(.system(size: 14))
+                                            .foregroundStyle(Theme.textSecondary)
+                                    }
+
+                                    if !customizations.flavors.isEmpty {
+                                        Text("Flavors: \(customizations.flavors.map { "\($0.type.rawValue) (\($0.amount))" }.joined(separator: ", "))")
+                                            .font(.system(size: 14))
+                                            .foregroundStyle(Theme.textSecondary)
+                                    }
+
+                                    if !customizations.spices.isEmpty {
+                                        Text("Spices: \(customizations.spices.joined(separator: ", "))")
+                                            .font(.system(size: 14))
+                                            .foregroundStyle(Theme.textSecondary)
+                                    }
+
+                                    if customizations.hasWhippedCream {
+                                        Text("Whipped Cream")
+                                            .font(.system(size: 14))
+                                            .foregroundStyle(Theme.textSecondary)
+                                    }
+
+                                    if let iceAmount = customizations.iceAmount {
+                                        Text(iceAmount.rawValue)
+                                            .font(.system(size: 14))
+                                            .foregroundStyle(Theme.textSecondary)
+                                    }
+                                }
+                                .padding(12)
+                                .background(Theme.cream)
+                                .cornerRadius(Theme.cornerRadiusMedium)
+                            } else {
+                                Text("No customizations")
+                                    .font(.system(size: 14))
+                                    .foregroundStyle(Theme.textSecondary)
+                                    .padding(12)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .background(Theme.cream)
+                                    .cornerRadius(Theme.cornerRadiusMedium)
+                            }
+                        }
                     }
                     .padding(.horizontal)
 

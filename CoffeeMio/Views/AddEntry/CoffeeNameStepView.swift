@@ -18,7 +18,7 @@ struct CoffeeNameStepView: View {
             Spacer()
 
             // Question
-            Text("What coffee are you\nbrewing today?")
+            Text("Coffee name?")
                 .font(.system(size: 32, weight: .bold, design: .rounded))
                 .foregroundStyle(Theme.primaryBrown)
                 .multilineTextAlignment(.center)

@@ -14,18 +14,22 @@ struct ReviewStepView: View {
     let coffeeName: String
     let roaster: String
     let brewMethod: BrewMethod?
+    let servingStyle: ServingStyle?
     let roastLevel: RoastLevel?
     let grindSize: Double
     let coffeeGrams: Double
     let waterGrams: Double
-    let waterTemp: Double
+    let waterTemp: Double?
     let brewMinutes: Int
     let brewSeconds: Int
     let rating: Double
     let tastingNotes: [String]
     let personalNotes: String
     let selectedImage: UIImage?
+    let customizations: CoffeeCustomizations?
     let onSave: () -> Void
+
+    @State private var showCustomizations = false
 
     var grindLabel: String {
         switch grindSize {
@@ -107,14 +111,23 @@ struct ReviewStepView: View {
 
                         Divider()
 
-                        // Brew method and roast
-                        HStack(spacing: 24) {
-                            if let brewMethod = brewMethod {
-                                DetailItem(icon: brewMethod.icon, label: "Method", value: brewMethod.rawValue)
+                        // Brew method, serving style, and roast
+                        VStack(spacing: 12) {
+                            HStack(spacing: 24) {
+                                if let brewMethod = brewMethod {
+                                    DetailItem(icon: brewMethod.icon, label: "Method", value: brewMethod.rawValue)
+                                }
+                                Spacer()
+                                if let servingStyle = servingStyle {
+                                    DetailItem(icon: servingStyle.icon, label: "Serving", value: servingStyle.rawValue)
+                                }
                             }
-                            Spacer()
-                            if let roastLevel = roastLevel {
-                                DetailItem(icon: "flame.fill", label: "Roast", value: roastLevel.rawValue)
+
+                            HStack(spacing: 24) {
+                                if let roastLevel = roastLevel {
+                                    DetailItem(icon: "flame.fill", label: "Roast", value: roastLevel.rawValue)
+                                }
+                                Spacer()
                             }
                         }
 
@@ -129,13 +142,18 @@ struct ReviewStepView: View {
                             }
 
                             HStack(spacing: 24) {
-                                DetailItem(
-                                    icon: "thermometer",
-                                    label: "Water",
-                                    value: temperatureManager.displayTemperature(waterTemp)
-                                )
-                                Spacer()
+                                if let waterTemp = waterTemp {
+                                    DetailItem(
+                                        icon: "thermometer",
+                                        label: "Water",
+                                        value: temperatureManager.displayTemperature(waterTemp)
+                                    )
+                                    Spacer()
+                                }
                                 DetailItem(icon: "clock.fill", label: "Time", value: brewTime)
+                                if waterTemp == nil {
+                                    Spacer()
+                                }
                             }
                         }
 
@@ -176,6 +194,113 @@ struct ReviewStepView: View {
                                 Text(personalNotes)
                                     .font(.system(size: 15, weight: .regular))
                                     .foregroundStyle(Theme.primaryBrown)
+                            }
+                        }
+
+                        // Customizations (collapsible)
+                        if let customizations = customizations, customizations.hasAnyCustomizations {
+                            Divider()
+
+                            VStack(alignment: .leading, spacing: 8) {
+                                Button(action: {
+                                    withAnimation(.spring(response: 0.3)) {
+                                        showCustomizations.toggle()
+                                    }
+                                }) {
+                                    HStack {
+                                        Label("Customizations", systemImage: "slider.horizontal.3")
+                                            .font(.system(size: 14, weight: .semibold))
+                                            .foregroundStyle(Theme.textSecondary)
+
+                                        Spacer()
+
+                                        Image(systemName: showCustomizations ? "chevron.up" : "chevron.down")
+                                            .font(.system(size: 12, weight: .semibold))
+                                            .foregroundStyle(Theme.textSecondary)
+                                    }
+                                }
+                                .buttonStyle(PlainButtonStyle())
+
+                                if showCustomizations {
+                                    VStack(alignment: .leading, spacing: 12) {
+                                        if let milk = customizations.milk {
+                                            VStack(alignment: .leading, spacing: 4) {
+                                                Text("Milk")
+                                                    .font(.system(size: 12, weight: .medium))
+                                                    .foregroundStyle(Theme.textSecondary)
+
+                                                HStack {
+                                                    Text(milk.type.rawValue)
+                                                    Text("•")
+                                                    Text(milk.amount)
+                                                    if let temp = milk.temperature {
+                                                        Text("•")
+                                                        Text(temp.rawValue)
+                                                    }
+                                                    if let foam = milk.foamLevel {
+                                                        Text("•")
+                                                        Text(foam.rawValue)
+                                                    }
+                                                }
+                                                .font(.system(size: 14, weight: .regular))
+                                                .foregroundStyle(Theme.primaryBrown)
+                                            }
+                                        }
+
+                                        if !customizations.sweeteners.isEmpty {
+                                            VStack(alignment: .leading, spacing: 4) {
+                                                Text("Sweeteners")
+                                                    .font(.system(size: 12, weight: .medium))
+                                                    .foregroundStyle(Theme.textSecondary)
+
+                                                ForEach(Array(customizations.sweeteners.enumerated()), id: \.offset) { _, sweetener in
+                                                    Text("\(sweetener.type.rawValue) - \(sweetener.amount)")
+                                                        .font(.system(size: 14, weight: .regular))
+                                                        .foregroundStyle(Theme.primaryBrown)
+                                                }
+                                            }
+                                        }
+
+                                        if !customizations.flavors.isEmpty {
+                                            VStack(alignment: .leading, spacing: 4) {
+                                                Text("Flavors")
+                                                    .font(.system(size: 12, weight: .medium))
+                                                    .foregroundStyle(Theme.textSecondary)
+
+                                                ForEach(Array(customizations.flavors.enumerated()), id: \.offset) { _, flavor in
+                                                    Text("\(flavor.type.rawValue) - \(flavor.amount)")
+                                                        .font(.system(size: 14, weight: .regular))
+                                                        .foregroundStyle(Theme.primaryBrown)
+                                                }
+                                            }
+                                        }
+
+                                        if !customizations.spices.isEmpty {
+                                            VStack(alignment: .leading, spacing: 4) {
+                                                Text("Spices")
+                                                    .font(.system(size: 12, weight: .medium))
+                                                    .foregroundStyle(Theme.textSecondary)
+
+                                                Text(customizations.spices.joined(separator: ", "))
+                                                    .font(.system(size: 14, weight: .regular))
+                                                    .foregroundStyle(Theme.primaryBrown)
+                                            }
+                                        }
+
+                                        if customizations.hasWhippedCream {
+                                            Text("Whipped Cream")
+                                                .font(.system(size: 14, weight: .regular))
+                                                .foregroundStyle(Theme.primaryBrown)
+                                        }
+
+                                        if let iceAmount = customizations.iceAmount {
+                                            Text(iceAmount.rawValue)
+                                                .font(.system(size: 14, weight: .regular))
+                                                .foregroundStyle(Theme.primaryBrown)
+                                        }
+                                    }
+                                    .padding(.top, 8)
+                                }
                             }
                         }
                     }

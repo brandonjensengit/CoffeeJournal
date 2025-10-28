@@ -18,6 +18,7 @@ struct EntryDetailView: View {
 
     @State private var showingDeleteAlert = false
     @State private var showingEditView = false
+    @State private var showCustomizations = false
 
     var body: some View {
         ScrollView {
@@ -88,40 +89,62 @@ struct EntryDetailView: View {
 
                     Divider()
 
-                    // Brew Method & Roast Level
-                    HStack(spacing: Theme.spacingL) {
-                        VStack(alignment: .leading, spacing: 8) {
-                            Label("Brew Method", systemImage: "drop.fill")
-                                .font(.caption)
-                                .foregroundStyle(Theme.textSecondary)
+                    // Brew Method, Serving, & Roast Level
+                    VStack(spacing: Theme.spacingM) {
+                        HStack(spacing: Theme.spacingL) {
+                            VStack(alignment: .leading, spacing: 8) {
+                                Label("Brew Method", systemImage: "drop.fill")
+                                    .font(.caption)
+                                    .foregroundStyle(Theme.textSecondary)
 
-                            HStack(spacing: 8) {
-                                Image(systemName: entry.brewMethod.icon)
-                                    .font(.system(size: 24))
-                                    .foregroundStyle(Theme.warmOrange)
+                                HStack(spacing: 8) {
+                                    Image(systemName: entry.brewMethod.icon)
+                                        .font(.system(size: 24))
+                                        .foregroundStyle(Theme.warmOrange)
 
-                                Text(entry.brewMethod.rawValue)
-                                    .font(.system(size: 16, weight: .semibold))
-                                    .foregroundStyle(Theme.textPrimary)
+                                    Text(entry.brewMethod.rawValue)
+                                        .font(.system(size: 16, weight: .semibold))
+                                        .foregroundStyle(Theme.textPrimary)
+                                }
+                            }
+
+                            Spacer()
+
+                            VStack(alignment: .leading, spacing: 8) {
+                                Label("Serving", systemImage: entry.isIced ? "snowflake" : "cup.and.saucer.fill")
+                                    .font(.caption)
+                                    .foregroundStyle(Theme.textSecondary)
+
+                                HStack(spacing: 8) {
+                                    Image(systemName: entry.isIced ? "snowflake" : "cup.and.saucer.fill")
+                                        .font(.system(size: 24))
+                                        .foregroundStyle(entry.isIced ? Color(hex: "87CEEB") : Theme.warmOrange)
+
+                                    Text(entry.isIced ? "Iced" : "Hot")
+                                        .font(.system(size: 16, weight: .semibold))
+                                        .foregroundStyle(Theme.textPrimary)
+                                }
                             }
                         }
 
-                        Spacer()
+                        HStack(spacing: Theme.spacingL) {
+                            VStack(alignment: .leading, spacing: 8) {
+                                Label("Roast Level", systemImage: "flame.fill")
+                                    .font(.caption)
+                                    .foregroundStyle(Theme.textSecondary)
 
-                        VStack(alignment: .leading, spacing: 8) {
-                            Label("Roast Level", systemImage: "flame.fill")
-                                .font(.caption)
-                                .foregroundStyle(Theme.textSecondary)
+                                HStack(spacing: 8) {
+                                    Circle()
+                                        .fill(roastColor(entry.roastLevel))
+                                        .frame(width: 24, height: 24)
 
-                            HStack(spacing: 8) {
-                                Circle()
-                                    .fill(roastColor(entry.roastLevel))
-                                    .frame(width: 24, height: 24)
-
-                                Text(entry.roastLevel.rawValue)
-                                    .font(.system(size: 16, weight: .semibold))
-                                    .foregroundStyle(Theme.textPrimary)
+                                    Text(entry.roastLevel.rawValue)
+                                        .font(.system(size: 16, weight: .semibold))
+                                        .foregroundStyle(Theme.textPrimary)
+                                }
                             }
+
+                            Spacer()
                         }
                     }
 
@@ -137,7 +160,9 @@ struct EntryDetailView: View {
                             ParameterCard(icon: "scalemass.fill", label: "Coffee", value: "\(Int(entry.coffeeGrams))g")
                             ParameterCard(icon: "drop.fill", label: "Water", value: "\(Int(entry.waterGrams))g")
                             ParameterCard(icon: "chart.line.uptrend.xyaxis", label: "Ratio", value: entry.brewRatio)
-                            ParameterCard(icon: "thermometer", label: "Temperature", value: temperatureManager.displayTemperature(entry.waterTemperature))
+                            if let waterTemp = entry.waterTemperature {
+                                ParameterCard(icon: "thermometer", label: "Temperature", value: temperatureManager.displayTemperature(waterTemp))
+                            }
                             ParameterCard(icon: "clock.fill", label: "Brew Time", value: entry.totalBrewTime)
                             ParameterCard(icon: "circle.grid.3x3.fill", label: "Grind", value: grindLabel(entry.grindSize))
                         }
@@ -184,6 +209,146 @@ struct EntryDetailView: View {
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 .background(Theme.cream)
                                 .cornerRadius(Theme.cornerRadiusMedium)
+                        }
+
+                        Divider()
+                    }
+
+                    // Customizations
+                    if let customizations = entry.customizations, customizations.hasAnyCustomizations {
+                        VStack(alignment: .leading, spacing: Theme.spacingM) {
+                            Button(action: {
+                                withAnimation(.spring(response: 0.3)) {
+                                    showCustomizations.toggle()
+                                }
+                            }) {
+                                HStack {
+                                    Text("Customizations")
+                                        .font(.system(size: 20, weight: .bold))
+                                        .foregroundStyle(Theme.textPrimary)
+
+                                    Spacer()
+
+                                    Image(systemName: showCustomizations ? "chevron.up.circle.fill" : "chevron.down.circle.fill")
+                                        .font(.system(size: 20))
+                                        .foregroundStyle(Theme.warmOrange)
+                                }
+                            }
+                            .buttonStyle(PlainButtonStyle())
+
+                            if showCustomizations {
+                                VStack(alignment: .leading, spacing: Theme.spacingM) {
+                                    if let milk = customizations.milk {
+                                        VStack(alignment: .leading, spacing: 8) {
+                                            HStack {
+                                                Image(systemName: "drop.fill")
+                                                    .foregroundStyle(Theme.warmOrange)
+                                                Text("Milk")
+                                                    .font(.system(size: 16, weight: .semibold))
+                                                    .foregroundStyle(Theme.textPrimary)
+                                            }
+
+                                            HStack {
+                                                Text(milk.type.rawValue)
+                                                Text("•")
+                                                Text(milk.amount)
+                                                if let temp = milk.temperature {
+                                                    Text("•")
+                                                    Text(temp.rawValue)
+                                                }
+                                                if let foam = milk.foamLevel {
+                                                    Text("•")
+                                                    Text(foam.rawValue)
+                                                }
+                                            }
+                                            .font(.system(size: 15))
+                                            .foregroundStyle(Theme.textSecondary)
+                                        }
+                                        .padding(Theme.spacingM)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                        .background(Theme.cream)
+                                        .cornerRadius(Theme.cornerRadiusMedium)
+                                    }
+
+                                    if !customizations.sweeteners.isEmpty {
+                                        VStack(alignment: .leading, spacing: 8) {
+                                            HStack {
+                                                Image(systemName: "cube.fill")
+                                                    .foregroundStyle(Theme.warmOrange)
+                                                Text("Sweeteners")
+                                                    .font(.system(size: 16, weight: .semibold))
+                                                    .foregroundStyle(Theme.textPrimary)
+                                            }
+
+                                            ForEach(Array(customizations.sweeteners.enumerated()), id: \.offset) { _, sweetener in
+                                                Text("\(sweetener.type.rawValue) - \(sweetener.amount)")
+                                                    .font(.system(size: 15))
+                                                    .foregroundStyle(Theme.textSecondary)
+                                            }
+                                        }
+                                        .padding(Theme.spacingM)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                        .background(Theme.cream)
+                                        .cornerRadius(Theme.cornerRadiusMedium)
+                                    }
+
+                                    if !customizations.flavors.isEmpty {
+                                        VStack(alignment: .leading, spacing: 8) {
+                                            HStack {
+                                                Image(systemName: "sparkles")
+                                                    .foregroundStyle(Theme.warmOrange)
+                                                Text("Flavors")
+                                                    .font(.system(size: 16, weight: .semibold))
+                                                    .foregroundStyle(Theme.textPrimary)
+                                            }
+
+                                            ForEach(Array(customizations.flavors.enumerated()), id: \.offset) { _, flavor in
+                                                Text("\(flavor.type.rawValue) - \(flavor.amount)")
+                                                    .font(.system(size: 15))
+                                                    .foregroundStyle(Theme.textSecondary)
+                                            }
+                                        }
+                                        .padding(Theme.spacingM)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                        .background(Theme.cream)
+                                        .cornerRadius(Theme.cornerRadiusMedium)
+                                    }
+
+                                    if !customizations.spices.isEmpty || customizations.hasWhippedCream || customizations.iceAmount != nil {
+                                        VStack(alignment: .leading, spacing: 8) {
+                                            HStack {
+                                                Image(systemName: "leaf.fill")
+                                                    .foregroundStyle(Theme.warmOrange)
+                                                Text("Extras")
+                                                    .font(.system(size: 16, weight: .semibold))
+                                                    .foregroundStyle(Theme.textPrimary)
+                                            }
+
+                                            if !customizations.spices.isEmpty {
+                                                Text("Spices: \(customizations.spices.joined(separator: ", "))")
+                                                    .font(.system(size: 15))
+                                                    .foregroundStyle(Theme.textSecondary)
+                                            }
+
+                                            if customizations.hasWhippedCream {
+                                                Text("Whipped Cream")
+                                                    .font(.system(size: 15))
+                                                    .foregroundStyle(Theme.textSecondary)
+                                            }
+
+                                            if let iceAmount = customizations.iceAmount {
+                                                Text(iceAmount.rawValue)
+                                                    .font(.system(size: 15))
+                                                    .foregroundStyle(Theme.textSecondary)
+                                            }
+                                        }
+                                        .padding(Theme.spacingM)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                        .background(Theme.cream)
+                                        .cornerRadius(Theme.cornerRadiusMedium)
+                                    }
+                                }
+                            }
                         }
 
                         Divider()

@@ -56,6 +56,7 @@ struct HomeView: View {
                             }
                         }
                         .padding()
+                        .padding(.top, 40) // Extra top padding to clear large logo
                     }
                 }
             }

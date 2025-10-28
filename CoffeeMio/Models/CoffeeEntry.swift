@@ -19,7 +19,7 @@ final class CoffeeEntry {
     var grindSize: Double // 1.0 (fine) to 10.0 (coarse)
     var coffeeGrams: Double
     var waterGrams: Double
-    var waterTemperature: Double // in Celsius
+    var waterTemperature: Double? // in Celsius (nil for cold brew)
     var brewTimeMinutes: Int
     var brewTimeSeconds: Int
     var rating: Double // 1.0 to 5.0
@@ -27,7 +27,9 @@ final class CoffeeEntry {
     var personalNotes: String
     var dateLogged: Date
     var isFavorite: Bool
+    var isIced: Bool // Hot or iced serving
     var photoData: Data?
+    var customizations: CoffeeCustomizations?
 
     init(
         id: UUID = UUID(),
@@ -39,7 +41,7 @@ final class CoffeeEntry {
         grindSize: Double = 5.0,
         coffeeGrams: Double = 18.0,
         waterGrams: Double = 300.0,
-        waterTemperature: Double = 93.0,
+        waterTemperature: Double? = 93.0,
         brewTimeMinutes: Int = 3,
         brewTimeSeconds: Int = 0,
         rating: Double = 3.0,
@@ -47,7 +49,9 @@ final class CoffeeEntry {
         personalNotes: String = "",
         dateLogged: Date = Date(),
         isFavorite: Bool = false,
-        photoData: Data? = nil
+        isIced: Bool = false,
+        photoData: Data? = nil,
+        customizations: CoffeeCustomizations? = nil
     ) {
         self.id = id
         self.coffeeName = coffeeName
@@ -66,7 +70,9 @@ final class CoffeeEntry {
         self.personalNotes = personalNotes
         self.dateLogged = dateLogged
         self.isFavorite = isFavorite
+        self.isIced = isIced
         self.photoData = photoData
+        self.customizations = customizations
     }
 
     var brewRatio: String {
@@ -101,7 +107,7 @@ enum BrewMethod: String, Codable, CaseIterable {
         case .espresso: return "cup.and.saucer.fill"
         case .pourOver: return "drop.fill"
         case .frenchPress: return "cylinder.fill"
-        case .aeroPress: return "chart.line.uptrend.xyaxis"
+        case .aeroPress: return "arrow.down.circle.fill"
         case .coldBrew: return "snowflake"
         case .mokaPot: return "flame.fill"
         case .drip: return "drop.triangle.fill"
@@ -123,6 +129,18 @@ enum RoastLevel: String, Codable, CaseIterable {
         case .medium: return "RoastMedium"
         case .mediumDark: return "RoastMediumDark"
         case .dark: return "RoastDark"
+        }
+    }
+}
+
+enum ServingStyle: String, Codable, CaseIterable {
+    case hot = "Hot"
+    case iced = "Iced"
+
+    var icon: String {
+        switch self {
+        case .hot: return "cup.and.saucer.fill"
+        case .iced: return "snowflake"
         }
     }
 }

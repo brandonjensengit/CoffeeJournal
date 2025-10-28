@@ -11,27 +11,31 @@ enum CoffeeEntryStep: Int, CaseIterable, Identifiable {
     case coffeeName = 0
     case roaster = 1
     case brewMethod = 2
-    case roastLevel = 3
-    case grindSize = 4
-    case brewRatio = 5
-    case waterTemp = 6
-    case brewTime = 7
-    case rating = 8
-    case tastingNotes = 9
-    case personalNotes = 10
-    case photo = 11
-    case review = 12
+    case servingStyle = 3
+    case roastLevel = 4
+    case grindSize = 5
+    case brewRatio = 6
+    case waterTemp = 7
+    case brewTime = 8
+    case customizations = 9
+    case rating = 10
+    case tastingNotes = 11
+    case personalNotes = 12
+    case photo = 13
+    case review = 14
 
     var id: Int { rawValue }
 
     var question: String {
         switch self {
         case .coffeeName:
-            return "What coffee are you brewing today?"
+            return "Coffee name?"
         case .roaster:
             return "Who roasted it?"
         case .brewMethod:
             return "How are you brewing it?"
+        case .servingStyle:
+            return "Hot or Iced?"
         case .roastLevel:
             return "What's the roast level?"
         case .grindSize:
@@ -42,6 +46,8 @@ enum CoffeeEntryStep: Int, CaseIterable, Identifiable {
             return "How hot is the water?"
         case .brewTime:
             return "How long will it brew?"
+        case .customizations:
+            return "Keep it pure or customize?"
         case .rating:
             return "How was it?"
         case .tastingNotes:
@@ -57,7 +63,7 @@ enum CoffeeEntryStep: Int, CaseIterable, Identifiable {
 
     var isOptional: Bool {
         switch self {
-        case .personalNotes, .photo:
+        case .customizations, .personalNotes, .photo:
             return true
         default:
             return false

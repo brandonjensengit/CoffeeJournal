@@ -18,7 +18,7 @@ struct PersonalNotesStepView: View {
             Spacer()
 
             // Question
-            Text("Any thoughts or\nobservations?")
+            Text("Any thoughts?")
                 .font(.system(size: 32, weight: .bold, design: .rounded))
                 .foregroundStyle(Theme.primaryBrown)
                 .multilineTextAlignment(.center)
@@ -33,6 +33,7 @@ struct PersonalNotesStepView: View {
             VStack(alignment: .leading, spacing: 8) {
                 ZStack(alignment: .topLeading) {
                     TextEditor(text: $personalNotes)
+                        .padding(12)
                         .font(.system(size: 18, weight: .regular))
                         .foregroundStyle(Theme.primaryBrown)
                         .scrollContentBackground(.hidden)
@@ -49,8 +50,8 @@ struct PersonalNotesStepView: View {
                         Text("E.g., Perfect morning brew, pairs well with pastries...")
                             .font(.system(size: 18))
                             .foregroundStyle(Theme.textSecondary.opacity(0.5))
-                            .padding(.top, 8)
-                            .padding(.leading, 5)
+                            .padding(.top, 20)
+                            .padding(.leading, 17)
                             .allowsHitTesting(false)
                     }
                 }
@@ -72,6 +73,7 @@ struct PersonalNotesStepView: View {
             .padding(.horizontal, 32)
             .padding(.bottom, 32)
         }
+        .padding(.top, 40)
         .onAppear {
             // Small delay to allow transition to complete
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
